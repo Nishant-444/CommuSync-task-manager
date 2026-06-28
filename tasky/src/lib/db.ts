@@ -1,28 +1,21 @@
-import { neonConfig, Pool } from '@neondatabase/serverless';
-import { PrismaNeon } from '@prisma/adapter-neon';
-import ws from 'ws';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 import { PrismaClient } from '../generated/prisma/client';
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+const connectionString = process.env.DATABASE_URL;
 
-const databaseUrl = process.env.DATABASE_URL || '';
-
-let prismaClient: PrismaClient;
-
-if (databaseUrl.startsWith('prisma+postgres://')) {
-  // Use Prisma Accelerate (no adapter needed)
-  prismaClient = globalForPrisma.prisma || new PrismaClient({
-    accelerateUrl: databaseUrl,
-  });
-} else {
-  // Use Neon DB adapter for PostgreSQL serverless environments
-  neonConfig.webSocketConstructor = ws;
-  const pool = new Pool({ connectionString: databaseUrl });
-  const adapter = new PrismaNeon(pool as any);
-  prismaClient = globalForPrisma.prisma || new PrismaClient({ adapter });
+if (!connectionString) {
+  throw new Error('DATABASE_URL not found in .env');
 }
 
-export const prisma = prismaClient;
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient;
+};
+
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+
+export const prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
