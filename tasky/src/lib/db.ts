@@ -1,7 +1,7 @@
 import { neonConfig, Pool } from '@neondatabase/serverless';
 import { PrismaNeon } from '@prisma/adapter-neon';
 import ws from 'ws';
-import { PrismaClient } from '../generated/prisma';
+import { PrismaClient } from '../generated/prisma/client';
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
@@ -12,13 +12,13 @@ let prismaClient: PrismaClient;
 if (databaseUrl.startsWith('prisma+postgres://')) {
   // Use Prisma Accelerate (no adapter needed)
   prismaClient = globalForPrisma.prisma || new PrismaClient({
-    datasourceUrl: databaseUrl,
+    accelerateUrl: databaseUrl,
   });
 } else {
   // Use Neon DB adapter for PostgreSQL serverless environments
   neonConfig.webSocketConstructor = ws;
   const pool = new Pool({ connectionString: databaseUrl });
-  const adapter = new PrismaNeon(pool);
+  const adapter = new PrismaNeon(pool as any);
   prismaClient = globalForPrisma.prisma || new PrismaClient({ adapter });
 }
 
