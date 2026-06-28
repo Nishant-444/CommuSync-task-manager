@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useTransition, useActionState } from 'react';
-import { createTask, toggleTask, deleteTask } from './actions';
+import { createTask, toggleTask, deleteTask, ActionState } from './actions';
 
 interface Task {
   id: string;
@@ -26,7 +26,7 @@ export default function TaskDashboard({ initialTasks }: TaskDashboardProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Initial state for form validation
-  const initialState = {
+  const initialState: ActionState = {
     success: false,
     errors: {} as Record<string, string>,
     values: { title: '', description: '' },
@@ -34,7 +34,7 @@ export default function TaskDashboard({ initialTasks }: TaskDashboardProps) {
 
   // Form submission handler using useActionState (React 19)
   const [formState, formAction, isFormSubmitting] = useActionState(
-    async (prevState: any, formData: FormData) => {
+    async (prevState: ActionState, formData: FormData) => {
       const res = await createTask(prevState, formData);
       if (res.success) {
         // Refresh the local task list (we can fetch again or manually add it since we know the parameters)

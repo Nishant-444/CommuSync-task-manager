@@ -4,6 +4,13 @@ import { revalidatePath } from 'next/cache';
 import { prisma } from '../lib/db';
 import { taskSchema } from '../lib/validations';
 
+export interface ActionState {
+  success: boolean;
+  errors?: Record<string, string>;
+  error?: string;
+  values?: { title: string; description: string };
+}
+
 export async function getTasks() {
   try {
     return await prisma.task.findMany({
@@ -11,13 +18,13 @@ export async function getTasks() {
         createdAt: 'desc',
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching tasks:', error);
     return [];
   }
 }
 
-export async function createTask(prevState: any, formData: FormData) {
+export async function createTask(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
 
@@ -48,11 +55,12 @@ export async function createTask(prevState: any, formData: FormData) {
     });
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating task:', error);
+    const message = error instanceof Error ? error.message : 'An unknown error occurred';
     return {
       success: false,
-      error: error.message || 'Failed to create task. Please try again.',
+      error: message,
       values: { title, description },
     };
   }
@@ -69,9 +77,10 @@ export async function toggleTask(id: string, completed: boolean) {
     });
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating task:', error);
-    return { success: false, error: error.message || 'Failed to update task' };
+    const message = error instanceof Error ? error.message : 'An unknown error occurred';
+    return { success: false, error: message };
   }
 }
 
@@ -85,8 +94,9 @@ export async function deleteTask(id: string) {
     });
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting task:', error);
-    return { success: false, error: error.message || 'Failed to delete task' };
+    const message = error instanceof Error ? error.message : 'An unknown error occurred';
+    return { success: false, error: message };
   }
 }
