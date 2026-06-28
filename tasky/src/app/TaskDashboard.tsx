@@ -23,6 +23,7 @@ export default function TaskDashboard({ initialTasks }: TaskDashboardProps) {
   const [filter, setFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isPending, startTransition] = useTransition();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Initial state for form validation
   const initialState = {
@@ -69,8 +70,6 @@ export default function TaskDashboard({ initialTasks }: TaskDashboardProps) {
 
   // Delete task
   const handleDelete = (id: string) => {
-    if (!confirm('Are you sure you want to delete this task?')) return;
-
     // Optimistic UI update
     const originalTasks = [...tasks];
     setTasks((prev) => prev.filter((t) => t.id !== id));
@@ -275,13 +274,33 @@ export default function TaskDashboard({ initialTasks }: TaskDashboardProps) {
                     </div>
                   </div>
 
-                  {/* Delete button (only visible on hover for cleaner UI, or always on mobile) */}
-                  <button
-                    onClick={() => handleDelete(task.id)}
-                    className="text-xs font-mono text-muted hover:text-foreground opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider cursor-pointer"
-                  >
-                    [Delete]
-                  </button>
+                  {/* Delete/Confirmation actions */}
+                  {deletingId === task.id ? (
+                    <div className="flex gap-2 text-xs font-mono">
+                      <button
+                        onClick={() => {
+                          handleDelete(task.id);
+                          setDeletingId(null);
+                        }}
+                        className="text-foreground hover:text-red-500 font-bold uppercase cursor-pointer"
+                      >
+                        [Confirm]
+                      </button>
+                      <button
+                        onClick={() => setDeletingId(null)}
+                        className="text-muted hover:text-foreground cursor-pointer"
+                      >
+                        [Cancel]
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setDeletingId(task.id)}
+                      className="text-xs font-mono text-muted hover:text-foreground opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider cursor-pointer"
+                    >
+                      [Delete]
+                    </button>
+                  )}
                 </article>
               ))
             )}
