@@ -292,13 +292,6 @@ export default function TaskDashboard({ initialTasks }: TaskDashboardProps) {
       {/* Footer */}
       <footer className="mt-24 border-t border-border pt-8 text-[10px] font-mono text-muted flex flex-col sm:flex-row justify-between items-center gap-2">
         <div>tasky. created for assessment</div>
-        <div className="flex gap-4">
-          <span>no-auth</span>
-          <span>&middot;</span>
-          <span>prisma 7</span>
-          <span>&middot;</span>
-          <span>neon db</span>
-        </div>
       </footer>
     </div>
   );
