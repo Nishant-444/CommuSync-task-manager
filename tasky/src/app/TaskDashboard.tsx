@@ -104,7 +104,14 @@ export default function TaskDashboard({ initialTasks }: TaskDashboardProps) {
       {/* Header */}
       <header className="mb-12 border-b border-border pb-8 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight font-mono">tasky.</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-4xl font-extrabold tracking-tight font-mono">tasky.</h1>
+            {isPending && (
+              <span className="text-[10px] font-mono uppercase tracking-wider text-muted animate-pulse border border-border px-1.5 py-0.5 rounded-sm">
+                syncing...
+              </span>
+            )}
+          </div>
           <p className="text-sm text-muted mt-1 font-mono">a bare-minimum task manager</p>
         </div>
         <div className="text-xs font-mono text-muted bg-surface border border-border px-3 py-1.5 rounded-sm self-start">
