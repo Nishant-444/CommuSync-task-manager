@@ -264,7 +264,7 @@ export default function TaskDashboard({ initialTasks }: TaskDashboardProps) {
                       </p>
                     )}
                     <div className="mt-2.5 flex items-center gap-3 text-[10px] font-mono text-muted">
-                      <span>
+                      <span suppressHydrationWarning>
                         {new Date(task.createdAt).toLocaleDateString(undefined, {
                           month: 'short',
                           day: 'numeric',
